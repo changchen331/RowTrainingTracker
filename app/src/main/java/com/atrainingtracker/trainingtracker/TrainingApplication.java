@@ -1,5 +1,3 @@
-
-
 package com.atrainingtracker.trainingtracker;
 
 import android.app.Application;
@@ -16,9 +14,11 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+
 import android.util.Log;
 import android.widget.Toast;
 
@@ -545,6 +545,7 @@ public class TrainingApplication extends Application {
     public static void setStravaRefreshToken(String refreshToken) {
         cSharedPreferences.edit().putString(SP_STRAVA_REFRESH_TOKEN, refreshToken).apply();
     }
+
     public static String getStravaRefreshToken() {
         return cSharedPreferences.getString(SP_STRAVA_REFRESH_TOKEN, null);
     }
@@ -552,6 +553,7 @@ public class TrainingApplication extends Application {
     public static void setStravaTokenExpiresAt(int expiresAt) {
         cSharedPreferences.edit().putInt(SP_STRAVA_TOKEN_EXPIRES_AT, expiresAt).apply();
     }
+
     public static int getStravaTokenExpiresAt() {
         return cSharedPreferences.getInt(SP_STRAVA_TOKEN_EXPIRES_AT, 0);
     }
@@ -884,11 +886,7 @@ public class TrainingApplication extends Application {
         newIntent.setAction("TrackerService");
         mStartMainActivityPendingIntent = PendingIntent.getActivity(this, 0, newIntent, 0);  // TODO: correct???
 
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL__TRACKING_2)
-                .setSmallIcon(R.drawable.logo)
-                .setContentTitle(getString(R.string.TrainingTracker))
-                .setContentText(getString(R.string.notification_tracking))
-                .setContentIntent(mStartMainActivityPendingIntent);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL__TRACKING_2).setSmallIcon(R.drawable.logo).setContentTitle(getString(R.string.TrainingTracker)).setContentText(getString(R.string.notification_tracking)).setContentIntent(mStartMainActivityPendingIntent);
 
         return notificationBuilder;
     }
@@ -903,19 +901,15 @@ public class TrainingApplication extends Application {
         }
 
         if (!BANALService.isSearching()) {
-            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.research_icon, getString(R.string.research),
-                    PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_START_SEARCH_FOR_PAIRED_DEVICES), 0))).build());
+            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.research_icon, getString(R.string.research), PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_START_SEARCH_FOR_PAIRED_DEVICES), 0))).build());
         }
 
         if (isPaused()) {
-            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_start, getString(R.string.Resume),
-                    PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_RESUME_FROM_PAUSED), 0))).build());
+            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_start, getString(R.string.Resume), PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_RESUME_FROM_PAUSED), 0))).build());
 
-            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_stop, getString(R.string.Stop),
-                    PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_STOP_TRACKING), 0))).build());
+            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_stop, getString(R.string.Stop), PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_STOP_TRACKING), 0))).build());
         } else {
-            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_pause, getString(R.string.Pause),
-                    PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_PAUSE_TRACKING), 0))).build());
+            mTrackingAndSearchingNotificationBuilder.addAction((new NotificationCompat.Action.Builder(R.drawable.control_pause, getString(R.string.Pause), PendingIntent.getBroadcast(this, 0, new Intent(REQUEST_PAUSE_TRACKING), 0))).build());
         }
     }
 
@@ -926,8 +920,7 @@ public class TrainingApplication extends Application {
         String sDistance = mDistanceFormatter.format_with_units(distance == null ? null : distance.getValue());
 
         // mTrackingAndSearchingNotificationBuilder.setDefaults(Notification.DEFAULT_ALL) // requires VIBRATE permission
-        mTrackingAndSearchingNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle()
-                .bigText(getString(R.string.tracking_details_format, mNotificationSummary, sDistance, sportType, sTime)));
+        mTrackingAndSearchingNotificationBuilder.setStyle(new NotificationCompat.BigTextStyle().bigText(getString(R.string.tracking_details_format, mNotificationSummary, sDistance, sportType, sTime)));
 
         // showNotification();
         mNotificationManager.notify(TRACKING_NOTIFICATION_ID, mTrackingAndSearchingNotificationBuilder.build());
@@ -1156,20 +1149,15 @@ public class TrainingApplication extends Application {
             notificationManager.deleteNotificationChannel(NOTIFICATION_CHANNEL__TRACKING);
 
             // Channel for Tracking
-            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL__TRACKING_2,
-                    getString(R.string.notification_channel_name__tracking),
-                    NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL__TRACKING_2, getString(R.string.notification_channel_name__tracking), NotificationManager.IMPORTANCE_LOW);
             channel.setDescription(getString(R.string.notification_channel_description__tracking));
             notificationManager.createNotificationChannel(channel); // Register the channel with the system;
 
-            channel = new NotificationChannel(NOTIFICATION_CHANNEL__EXPORT,
-                    getString(R.string.notification_channel_name__export),
-                    NotificationManager.IMPORTANCE_DEFAULT);
+            channel = new NotificationChannel(NOTIFICATION_CHANNEL__EXPORT, getString(R.string.notification_channel_name__export), NotificationManager.IMPORTANCE_DEFAULT);
             channel.setDescription(getString(R.string.notification_channel_description__export));
             notificationManager.createNotificationChannel(channel);
         }
     }
-
 
 
 }
