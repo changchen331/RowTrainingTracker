@@ -1,5 +1,3 @@
-
-
 package com.atrainingtracker.banalservice.devices.bluetooth_le;
 
 import android.annotation.TargetApi;
@@ -17,10 +15,9 @@ import com.atrainingtracker.banalservice.sensor.SensorType;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class BTLEHeartRateDevice extends MyBTLEDevice {
-    private static final boolean DEBUG = BANALService.DEBUG & false;
+    private static final boolean DEBUG = BANALService.DEBUG;
     protected MySensor<Integer> mHeartRateSensor;
-    private String TAG = "ANTHeartRateDevice";
-
+    private final String TAG = "ANTHeartRateDevice";
 
     /**
      * constructor
@@ -54,6 +51,5 @@ public class BTLEHeartRateDevice extends MyBTLEDevice {
         int heartRate = characteristic.getIntValue(format, 1);
         if (DEBUG) Log.i(TAG, String.format("Received heart rate: %d", heartRate));
         mHeartRateSensor.newValue(heartRate);
-
     }
 }

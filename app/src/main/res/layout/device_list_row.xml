@@ -75,6 +75,14 @@
                 android:focusable="false"
                 android:text="@string/pairedText" />
 
+            <Button
+                android:id="@+id/send"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5px"
+                android:text="发送"
+                android:textStyle="bold" />
+
         </LinearLayout>
 
         <TextView

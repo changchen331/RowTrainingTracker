@@ -1,6 +1,6 @@
-
-
 package com.atrainingtracker.banalservice.devices;
+
+import static com.atrainingtracker.banalservice.BSportType.UNKNOWN;
 
 import android.Manifest;
 import android.content.BroadcastReceiver;
@@ -17,6 +17,9 @@ import android.util.Log;
 import com.atrainingtracker.R;
 import com.atrainingtracker.banalservice.BANALService;
 import com.atrainingtracker.banalservice.BSportType;
+import com.atrainingtracker.banalservice.Protocol;
+import com.atrainingtracker.banalservice.database.DevicesDatabaseManager;
+import com.atrainingtracker.banalservice.database.DevicesDatabaseManager.DevicesDbHelper;
 import com.atrainingtracker.banalservice.devices.ant_plus.ANTBikeCadenceDevice;
 import com.atrainingtracker.banalservice.devices.ant_plus.ANTBikePowerDevice;
 import com.atrainingtracker.banalservice.devices.ant_plus.ANTBikeSpeedAndCadenceDevice;
@@ -34,14 +37,11 @@ import com.atrainingtracker.banalservice.devices.bluetooth_le.BTLEHeartRateDevic
 import com.atrainingtracker.banalservice.devices.bluetooth_le.MyBTLEDevice;
 import com.atrainingtracker.banalservice.devices.bluetooth_le.search_new.BTSearchForNewDevicesEngine;
 import com.atrainingtracker.banalservice.devices.bluetooth_le.search_new.BTSearchForNewDevicesEngine.IBTSearchForNewDevicesEngineInterface;
-import com.atrainingtracker.banalservice.Protocol;
+import com.atrainingtracker.banalservice.helpers.HavePressureSensor;
 import com.atrainingtracker.banalservice.sensor.MyAccumulatorSensor;
 import com.atrainingtracker.banalservice.sensor.MySensor;
 import com.atrainingtracker.banalservice.sensor.MySensorManager;
 import com.atrainingtracker.banalservice.sensor.SensorType;
-import com.atrainingtracker.banalservice.database.DevicesDatabaseManager;
-import com.atrainingtracker.banalservice.database.DevicesDatabaseManager.DevicesDbHelper;
-import com.atrainingtracker.banalservice.helpers.HavePressureSensor;
 import com.atrainingtracker.trainingtracker.TrainingApplication;
 import com.dsi.ant.plugins.antplus.pccbase.MultiDeviceSearch;
 import com.google.android.gms.common.ConnectionResult;
@@ -55,11 +55,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.atrainingtracker.banalservice.BSportType.UNKNOWN;
-
-
-public class DeviceManager
-        implements OnSharedPreferenceChangeListener {
+public class DeviceManager implements OnSharedPreferenceChangeListener {
     private static final String TAG = "DeviceManager";
     private static final boolean DEBUG = BANALService.DEBUG & false;
     protected static MyRemoteDevice cMyRemoteDeviceCurrentlySearchingFor = null;
@@ -98,8 +94,7 @@ public class DeviceManager
             long deviceID = intent.getLongExtra(BANALService.DEVICE_ID, -1);
             if (DEBUG)
                 Log.i(TAG, "finished searching for a remote device, success=" + success + ", deviceID=" + deviceID);
-            if (cMyRemoteDeviceCurrentlySearchingFor != null
-                    && cMyRemoteDeviceCurrentlySearchingFor.getDeviceId() == deviceID) {  // it is indeed the device that we are currently searching
+            if (cMyRemoteDeviceCurrentlySearchingFor != null && cMyRemoteDeviceCurrentlySearchingFor.getDeviceId() == deviceID) {  // it is indeed the device that we are currently searching
                 if (!success) {                                                     // it was not found
                     if (!mMyRemoteDeviceTries.containsKey(cMyRemoteDeviceCurrentlySearchingFor)        // device not in the list
                             || mMyRemoteDeviceTries.get(cMyRemoteDeviceCurrentlySearchingFor) <= 1) {  // no longer try to search for this device
@@ -187,11 +182,7 @@ public class DeviceManager
             // TODO:inform user with a toast?
         }
 
-        public void onNewDeviceFound(DeviceType deviceType,
-                                     String BluetoothMACAddress,
-                                     String name,
-                                     String manufacturer,
-                                     int batteryPercentage) {
+        public void onNewDeviceFound(DeviceType deviceType, String BluetoothMACAddress, String name, String manufacturer, int batteryPercentage) {
             if (DEBUG)
                 Log.d(TAG, "onNewBluetoothDeviceFound: " + deviceType.name() + ", BT address: " + BluetoothMACAddress);
 
@@ -248,21 +239,17 @@ public class DeviceManager
         }
 
 
-        if (TrainingApplication.useLocationSourceGPS()
-                && TrainingApplication.havePermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+        if (TrainingApplication.useLocationSourceGPS() && TrainingApplication.havePermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
             if (DEBUG) Log.i(TAG, "creating GPS location device");
             mSpeedAndLocationDevice_GPS = new SpeedAndLocationDevice_GPS(mContext, mSensorManager);
         }
 
-        if (TrainingApplication.useLocationSourceGoogleFused()
-                && TrainingApplication.havePermission(Manifest.permission.ACCESS_FINE_LOCATION)
-                && GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext) == ConnectionResult.SUCCESS) {
+        if (TrainingApplication.useLocationSourceGoogleFused() && TrainingApplication.havePermission(Manifest.permission.ACCESS_FINE_LOCATION) && GooglePlayServicesUtil.isGooglePlayServicesAvailable(mContext) == ConnectionResult.SUCCESS) {
             if (DEBUG) Log.i(TAG, "creating google fused location device");
             mSpeedAndLocationDevice_GoogleFused = new SpeedAndLocationDevice_GoogleFused(mContext, mSensorManager);
         }
 
-        if (TrainingApplication.useLocationSourceNetwork()
-                && TrainingApplication.havePermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
+        if (TrainingApplication.useLocationSourceNetwork() && TrainingApplication.havePermission(Manifest.permission.ACCESS_COARSE_LOCATION)) {
             if (DEBUG) Log.i(TAG, "creating network location device");
             mSpeedAndLocationDevice_Network = new SpeedAndLocationDevice_Network(mContext, mSensorManager);
         }
@@ -501,9 +488,7 @@ public class DeviceManager
         List<Long> availableDevicesList = new LinkedList<>();
 
         for (MyRemoteDevice remoteDevice : getRemoteDeviceList()) {
-            if ((protocol == Protocol.ALL || remoteDevice.getProtocol() == protocol)
-                    && (deviceType == DeviceType.ALL || remoteDevice.getDeviceType() == deviceType)
-                    && remoteDevice.isReceivingData()) {
+            if ((protocol == Protocol.ALL || remoteDevice.getProtocol() == protocol) && (deviceType == DeviceType.ALL || remoteDevice.getDeviceType() == deviceType) && remoteDevice.isReceivingData()) {
                 if (DEBUG) Log.i(TAG, "adding " + remoteDevice.getDeviceName());
                 availableDevicesList.add(remoteDevice.getDeviceId());
             }
@@ -743,13 +728,7 @@ public class DeviceManager
         SQLiteDatabase db = databaseManager.getOpenDatabase();
 
         // TODO: sort according to the LAST_ACTIVE field?
-        Cursor cursor = db.query(DevicesDbHelper.DEVICES,
-                new String[]{DevicesDbHelper.C_ID, DevicesDbHelper.PAIRED, DevicesDbHelper.DEVICE_TYPE, DevicesDbHelper.ANT_DEVICE_NUMBER, DevicesDbHelper.BT_ADDRESS},
-                DevicesDbHelper.PROTOCOL + "=?",
-                new String[]{protocol.name()},
-                null,
-                null,
-                null);
+        Cursor cursor = db.query(DevicesDbHelper.DEVICES, new String[]{DevicesDbHelper.C_ID, DevicesDbHelper.PAIRED, DevicesDbHelper.DEVICE_TYPE, DevicesDbHelper.ANT_DEVICE_NUMBER, DevicesDbHelper.BT_ADDRESS}, DevicesDbHelper.PROTOCOL + "=?", new String[]{protocol.name()}, null, null, null);
 
         while (cursor.moveToNext()) {
             if (cursor.getInt(cursor.getColumnIndexOrThrow(DevicesDbHelper.PAIRED)) > 0) {

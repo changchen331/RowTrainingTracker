@@ -8,9 +8,9 @@ import android.util.Log;
 
 import com.atrainingtracker.R;
 import com.atrainingtracker.banalservice.BANALService;
-import com.atrainingtracker.banalservice.devices.DeviceType;
 import com.atrainingtracker.banalservice.Protocol;
 import com.atrainingtracker.banalservice.database.DevicesDatabaseManager.DevicesDbHelper;
+import com.atrainingtracker.banalservice.devices.DeviceType;
 
 
 public class PairedRemoteDevicesFragment extends RemoteDevicesFragment {
@@ -43,39 +43,16 @@ public class PairedRemoteDevicesFragment extends RemoteDevicesFragment {
 
         if (mDeviceType == null) {
             // get an empty cursor
-            cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES,
-                    DeviceListCursorAdapter.COLUMNS,
-                    DevicesDbHelper.C_ID + "=?",
-                    new String[]{Long.toString(-1)},  // there must be no device with this device type byte
-                    null,
-                    null,
-                    null);
+            cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES, DeviceListCursorAdapter.COLUMNS, DevicesDbHelper.C_ID + "=?", new String[]{Long.toString(-1)},  // there must be no device with this device type byte
+                    null, null, null);
         } else if (mDeviceType == DeviceType.ALL) {
             if (mProtocol == Protocol.ALL) {
-                cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES,
-                        DeviceListCursorAdapter.COLUMNS,
-                        DevicesDbHelper.PAIRED + ">0",
-                        new String[]{},
-                        null,
-                        null,
-                        null);
+                cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES, DeviceListCursorAdapter.COLUMNS, DevicesDbHelper.PAIRED + ">0", new String[]{}, null, null, null);
             } else {
-                cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES,
-                        DeviceListCursorAdapter.COLUMNS,
-                        DevicesDbHelper.PROTOCOL + "=? AND " + DevicesDbHelper.PAIRED + ">0",
-                        new String[]{mProtocol.name()},
-                        null,
-                        null,
-                        null);
+                cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES, DeviceListCursorAdapter.COLUMNS, DevicesDbHelper.PROTOCOL + "=? AND " + DevicesDbHelper.PAIRED + ">0", new String[]{mProtocol.name()}, null, null, null);
             }
         } else {
-            cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES,
-                    DeviceListCursorAdapter.COLUMNS,
-                    DevicesDbHelper.DEVICE_TYPE + "=? AND " + DevicesDbHelper.PROTOCOL + "=? AND " + DevicesDbHelper.PAIRED + ">0",
-                    new String[]{mDeviceType.name(), mProtocol.name()},
-                    null,
-                    null,
-                    null);
+            cursor = mRemoteDevicesDb.query(DevicesDbHelper.DEVICES, DeviceListCursorAdapter.COLUMNS, DevicesDbHelper.DEVICE_TYPE + "=? AND " + DevicesDbHelper.PROTOCOL + "=? AND " + DevicesDbHelper.PAIRED + ">0", new String[]{mDeviceType.name(), mProtocol.name()}, null, null, null);
         }
 
         return cursor;

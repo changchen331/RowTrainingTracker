@@ -101,9 +101,7 @@ public abstract class MyBTLEDevice extends MyRemoteDevice {
         }
 
         @Override
-        public void onCharacteristicRead(BluetoothGatt gatt,
-                                         BluetoothGattCharacteristic characteristic,
-                                         int status) {
+        public void onCharacteristicRead(BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
             if (DEBUG) Log.i(TAG, "onCharacteristicRead: " + characteristic.getUuid());
 
             characteristicUpdate(gatt, characteristic);
@@ -181,7 +179,6 @@ public abstract class MyBTLEDevice extends MyRemoteDevice {
     public boolean isReceivingData() {
         return mState == State.CONNECTED_WITH_SERVICE;
     }
-
 
     @Override
     public void shutDown() {

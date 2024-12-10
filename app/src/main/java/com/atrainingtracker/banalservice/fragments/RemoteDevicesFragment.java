@@ -1,5 +1,3 @@
-
-
 package com.atrainingtracker.banalservice.fragments;
 
 import android.app.ProgressDialog;
@@ -11,7 +9,6 @@ import android.content.IntentFilter;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import androidx.fragment.app.Fragment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -25,27 +22,29 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import androidx.fragment.app.Fragment;
+
 import com.atrainingtracker.R;
 import com.atrainingtracker.banalservice.BANALService;
-import com.atrainingtracker.banalservice.devices.DeviceType;
 import com.atrainingtracker.banalservice.Protocol;
 import com.atrainingtracker.banalservice.database.DevicesDatabaseManager;
 import com.atrainingtracker.banalservice.database.DevicesDatabaseManager.DevicesDbHelper;
+import com.atrainingtracker.banalservice.devices.DeviceType;
 import com.atrainingtracker.trainingtracker.MyHelper;
 import com.atrainingtracker.trainingtracker.database.TrackingViewsDatabaseManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public abstract class RemoteDevicesFragment extends Fragment {
     private static final String TAG = "RemoteDevicesFragment";
-    private static final boolean DEBUG = BANALService.DEBUG && false;
+    private static final boolean DEBUG = BANALService.DEBUG;
     protected DeviceType mDeviceType;
     protected Protocol mProtocol;
     protected ListView lvDevices;
-
 
     // protected BANALServiceComm mBanalServiceComm;
     protected SQLiteDatabase mRemoteDevicesDb;
@@ -85,8 +84,7 @@ public abstract class RemoteDevicesFragment extends Fragment {
         try {
             mOnRemoteDeviceSelectedListener = (OnRemoteDeviceSelectedListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(context.toString()
-                    + " must implement OnRemoteDeviceSelectedListener");
+            throw new ClassCastException(context.toString() + " must implement OnRemoteDeviceSelectedListener");
         }
 
         try {
@@ -144,10 +142,7 @@ public abstract class RemoteDevicesFragment extends Fragment {
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(DevicesDbHelper.PAIRED, paired);
                 if (mRemoteDevicesDb != null) {
-                    mRemoteDevicesDb.update(DevicesDbHelper.DEVICES,
-                            contentValues,
-                            DevicesDbHelper.C_ID + "=?",
-                            new String[]{Long.toString(deviceId)});
+                    mRemoteDevicesDb.update(DevicesDbHelper.DEVICES, contentValues, DevicesDbHelper.C_ID + "=?", new String[]{Long.toString(deviceId)});
 
                     // then inform all others
                     sendPairingChangedIntent(deviceId, paired);
@@ -270,9 +265,7 @@ public abstract class RemoteDevicesFragment extends Fragment {
 
         showProgressDialog(getString(R.string.delete_device));
 
-        mRemoteDevicesDb.delete(DevicesDbHelper.DEVICES,
-                DevicesDbHelper.C_ID + "=?",
-                new String[]{deviceId + ""});
+        mRemoteDevicesDb.delete(DevicesDbHelper.DEVICES, DevicesDbHelper.C_ID + "=?", new String[]{deviceId + ""});
 
         // also 'remove' the device from the TrackingViewsDatabase
         TrackingViewsDatabaseManager.removeSourceDevice(deviceId);
@@ -356,17 +349,21 @@ public abstract class RemoteDevicesFragment extends Fragment {
                             for (Long deviceId : mRemoteDevicesAdapter.getDeviceIds()) {
                                 if (DEBUG) Log.d(TAG, "updating " + deviceId);
 
-                                if (mGetBanalServiceInterface != null
-                                        && mGetBanalServiceInterface.getBanalServiceComm() != null) {
+                                if (mGetBanalServiceInterface != null && mGetBanalServiceInterface.getBanalServiceComm() != null) {
                                     if (!mDeviceId2Units.containsKey(deviceId)) {
                                         mDeviceId2Units.put(deviceId, getString(MyHelper.getUnitsId(DevicesDatabaseManager.getDeviceType(deviceId).getMainSensorType())));
                                     }
-                                    mRemoteDevicesAdapter.updateMainField(deviceId, getString(R.string.ValueAndUnitFormat,
-                                            mGetBanalServiceInterface.getBanalServiceComm().getMainSensorStringValue(deviceId),
-                                            mDeviceId2Units.get(deviceId)));
+                                    mRemoteDevicesAdapter.updateMainField(deviceId, getString(R.string.ValueAndUnitFormat, mGetBanalServiceInterface.getBanalServiceComm().getMainSensorStringValue(deviceId), mDeviceId2Units.get(deviceId)));
+//                                    Log.d(TAG, "data " + mGetBanalServiceInterface.getBanalServiceComm().getMainSensorStringValue(deviceId));
+
+                                    String heartBeat = mGetBanalServiceInterface.getBanalServiceComm().getMainSensorStringValue(deviceId);
+                                    if (deviceId == 4L && !Objects.equals(heartBeat, "--")) {
+                                        mRemoteDevicesAdapter.addHeartBeats(Double.valueOf(mGetBanalServiceInterface.getBanalServiceComm().getMainSensorStringValue(deviceId)));
+                                    }
                                 } else {
                                     mRemoteDevicesAdapter.updateMainField(deviceId, getString(R.string.NoData));
                                 }
+
                             }
                         }
                     }

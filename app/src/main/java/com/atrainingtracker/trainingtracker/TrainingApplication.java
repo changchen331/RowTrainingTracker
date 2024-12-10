@@ -1158,6 +1158,4 @@ public class TrainingApplication extends Application {
             notificationManager.createNotificationChannel(channel);
         }
     }
-
-
 }

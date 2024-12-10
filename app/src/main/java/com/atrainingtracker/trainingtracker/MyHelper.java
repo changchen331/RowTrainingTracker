@@ -35,11 +35,7 @@ public class MyHelper {
         double result = Double.NaN;
         HttpClient httpClient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
-        String url = "http://gisdata.usgs.gov/"
-                + "xmlwebservices2/elevation_service.asmx/"
-                + "getElevation?X_Value=" + longitude
-                + "&Y_Value=" + latitude
-                + "&Elevation_Units=METERS&Source_Layer=-1&Elevation_Only=true";
+        String url = "http://gisdata.usgs.gov/" + "xmlwebservices2/elevation_service.asmx/" + "getElevation?X_Value=" + longitude + "&Y_Value=" + latitude + "&Elevation_Units=METERS&Source_Layer=-1&Elevation_Only=true";
         HttpGet httpGet = new HttpGet(url);
         try {
             HttpResponse response = httpClient.execute(httpGet, localContext);
@@ -48,8 +44,7 @@ public class MyHelper {
                 InputStream inputStream = entity.getContent();
                 int r = -1;
                 StringBuffer respStr = new StringBuffer();
-                while ((r = inputStream.read()) != -1)
-                    respStr.append((char) r);
+                while ((r = inputStream.read()) != -1) respStr.append((char) r);
                 String tagOpen = "<double>";
                 String tagClose = "</double>";
                 if (respStr.indexOf(tagOpen) != -1) {
@@ -72,10 +67,7 @@ public class MyHelper {
         double result = Double.NaN;
         HttpClient httpClient = new DefaultHttpClient();
         HttpContext localContext = new BasicHttpContext();
-        String url = "http://maps.googleapis.com/maps/api/elevation/"
-                + "xml?locations=" + latitude
-                + "," + longitude
-                + "&sensor=true";
+        String url = "http://maps.googleapis.com/maps/api/elevation/" + "xml?locations=" + latitude + "," + longitude + "&sensor=true";
         HttpGet httpGet = new HttpGet(url);
         try {
             HttpResponse response = httpClient.execute(httpGet, localContext);
@@ -84,8 +76,7 @@ public class MyHelper {
                 InputStream inputStream = entity.getContent();
                 int r = -1;
                 StringBuffer respStr = new StringBuffer();
-                while ((r = inputStream.read()) != -1)
-                    respStr.append((char) r);
+                while ((r = inputStream.read()) != -1) respStr.append((char) r);
                 String tagOpen = "<elevation>";
                 String tagClose = "</elevation>";
                 if (respStr.indexOf(tagOpen) != -1) {
@@ -258,8 +249,7 @@ public class MyHelper {
     }
 
     public static String formatRank(int i) {
-        int j = i % 10,
-                k = i % 100;
+        int j = i % 10, k = i % 100;
         if (j == 1 && k != 11) {
             return i + "st";
         }

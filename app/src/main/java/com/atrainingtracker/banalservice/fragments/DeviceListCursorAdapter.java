@@ -1,11 +1,13 @@
-
-
 package com.atrainingtracker.banalservice.fragments;
+
+import static com.atrainingtracker.utils.HttpRequests.getAsync;
+import static com.atrainingtracker.utils.HttpRequests.postAsync;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
@@ -15,12 +17,13 @@ import android.widget.TextView;
 
 import com.atrainingtracker.R;
 import com.atrainingtracker.banalservice.BANALService;
-import com.atrainingtracker.banalservice.devices.DeviceType;
 import com.atrainingtracker.banalservice.Protocol;
 import com.atrainingtracker.banalservice.database.DevicesDatabaseManager.DevicesDbHelper;
+import com.atrainingtracker.banalservice.devices.DeviceType;
 import com.atrainingtracker.banalservice.helpers.UIHelper;
 import com.atrainingtracker.trainingtracker.database.EquipmentDbHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -30,10 +33,11 @@ public class DeviceListCursorAdapter extends SimpleCursorAdapter {
     protected static final String[] FROM = {DevicesDbHelper.DEVICE_TYPE, DevicesDbHelper.NAME, DevicesDbHelper.C_ID, DevicesDbHelper.PAIRED, DevicesDbHelper.C_ID};
     protected static final int[] TO = {R.id.ivIcon, R.id.tvDeviceName, R.id.tvMainValue, R.id.cbPaired, R.id.tvEquipment};
     private static final String TAG = "DeviceListCursorAdapter";
-    private static final boolean DEBUG = BANALService.DEBUG & false;
+    private static final boolean DEBUG = BANALService.DEBUG;
     protected PairingChangedInterface mPairingChangedInterface;
     protected Context mContext;
     protected Map<Long, TextView> mDeviceId2tvMainValue;
+    protected ArrayList<Double> heartBeats;
 
     public DeviceListCursorAdapter(Context context, Cursor cursor, PairingChangedInterface pairingChangedInterface) {
         super(context, R.layout.device_list_row, cursor, FROM, TO);
@@ -41,11 +45,12 @@ public class DeviceListCursorAdapter extends SimpleCursorAdapter {
 
         mContext = context;
         mPairingChangedInterface = pairingChangedInterface;
-        mDeviceId2tvMainValue = new HashMap<Long, TextView>();
+        mDeviceId2tvMainValue = new HashMap<>();
+        heartBeats = new ArrayList<>();
     }
 
     public void deleteLookupTable() {
-        mDeviceId2tvMainValue = new HashMap<Long, TextView>();
+        mDeviceId2tvMainValue = new HashMap<>();
     }
 
     @Override
@@ -59,6 +64,16 @@ public class DeviceListCursorAdapter extends SimpleCursorAdapter {
         TextView tvMainValue = row.findViewById(R.id.tvMainValue);
         CheckBox cbPaired = row.findViewById(R.id.cbPaired);
         TextView tvEquipment = row.findViewById(R.id.tvEquipment);
+        Button send = row.findViewById(R.id.send);
+
+        send.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+//                Toast.makeText(mContext, heartBeats.toString(), Toast.LENGTH_SHORT).show();
+//                getAsync("http://www.baidu.com/");
+                postAsync("http://112.64.134.154:30002/function/AC/heartrate/", heartBeats);
+            }
+        });
 
         // get the data
         DeviceType deviceType = DeviceType.valueOf(cursor.getString(cursor.getColumnIndex(DevicesDbHelper.DEVICE_TYPE)));
@@ -105,6 +120,14 @@ public class DeviceListCursorAdapter extends SimpleCursorAdapter {
 
     public Set<Long> getDeviceIds() {
         return mDeviceId2tvMainValue.keySet();
+    }
+
+    public ArrayList<Double> getHeartBeats() {
+        return heartBeats;
+    }
+
+    public void addHeartBeats(Double heartBeat) {
+        heartBeats.add(heartBeat);
     }
 
     public interface PairingChangedInterface {
